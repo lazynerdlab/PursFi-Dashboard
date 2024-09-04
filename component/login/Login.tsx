@@ -33,9 +33,9 @@ const Login = () => {
   const dispatch = useAppDispatch();
   const [loading, setIsLoading] = useState(false);
   const [generateEmailOtp] = useGenerateEmailOtpMutation();
-  useEffect(() => {
-    dispatch(logOutAction());
-  }, []);
+  // useEffect(() => {
+  //   dispatch(logOutAction());
+  // }, []);
   const { replace } = useRouter();
   const [login, { isLoading }] = useLoginMutation();
   const [formData, setFormData] = useState(initailState);

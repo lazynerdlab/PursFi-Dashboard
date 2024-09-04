@@ -83,6 +83,14 @@ const remitaSlice = ApiSlice.enhanceEndpoints({
       }),
       invalidatesTags: ["remita-transaction"],
     }),
+    validateProduct: builder.mutation({
+      query: (body) => ({
+        url: "RemPayment/validate-customer",
+        body,
+        method: "POST",
+      }),
+      invalidatesTags: ["remita-transaction"],
+    }),
   }),
 });
 
@@ -100,4 +108,5 @@ export const {
   useLazyGetSingleTransactionQuery,
   useLazyGetTransactionHistoryQuery,
   useMakePaymentMutation,
+  useValidateProductMutation
 } = remitaSlice;

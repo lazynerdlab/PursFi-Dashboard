@@ -37,7 +37,6 @@ const Electricity = () => {
           </p>
         </span>
         <div className="flex items-center space-x-3">
-          {" "}
           <button className="btn btn-md  bg-gray-200 hover:bg-gray-200 text-white text-sm normal-case">
             Make Payment
           </button>

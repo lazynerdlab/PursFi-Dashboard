@@ -1,5 +1,5 @@
 "use client";
-import RemitaIcon from "@/assets/icon/RemitaIcon";
+import { LoadingOutlined } from "@ant-design/icons";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { GrFormPreviousLink } from "react-icons/gr";
@@ -7,13 +7,11 @@ import {
   CustomInput as Input,
   CustomButton as Button,
   CustomSelect as Select,
-  CustomRadioGroup as RadioGroup,
   CustomDatePicker as DatePicker,
   CustomTimePicker as TimePicker,
   CustomInputNumber as InputNumber,
 } from "@/lib/AntdComponents";
 import "react-phone-input-2/lib/style.css";
-import PhoneInput from "react-phone-input-2";
 import RemitaCable from "@/assets/icon/RemitaCable";
 import { FormEventHandler, useEffect, useState } from "react";
 import dayjs from "dayjs";
@@ -22,6 +20,7 @@ import {
   useLazyGetBillersByCategoryQuery,
   useLazyGetBillerProductsQuery,
   useMakePaymentMutation,
+  useValidateProductMutation,
 } from "@/services/remitaService";
 import { message } from "antd";
 const currentDate = new Date();
@@ -56,6 +55,8 @@ const Cable = () => {
   const [getBiller, { isLoading, data }] = useLazyGetBillersByCategoryQuery();
   const [getProduct, { isLoading: isLoadingProducts, data: products }] =
     useLazyGetBillerProductsQuery();
+  const [validateProduct, { isLoading: isvalidating }] =
+    useValidateProductMutation();
   useEffect(() => {
     if (params.get("id")) {
       getBiller({ categoryId: params.get("id") });
@@ -65,12 +66,13 @@ const Cable = () => {
         category_name: params.get("name") as string,
       }));
     }
-  }, [params.get("id")]);
+  }, [getBiller, params]);
   useEffect(() => {
     if (formdata?.biller_id) {
       getProduct({ billerId: formdata?.biller_id });
     }
-  }, [formdata?.biller_id]);
+  }, [formdata?.biller_id, getProduct]);
+
   const [selectedOption, setSelectedOption] = useState("");
 
   const options = [
@@ -99,6 +101,34 @@ const Cable = () => {
         message.error(err?.data?.responseDescription || "an error occured");
       });
   };
+  const validFields = productFields.filter((field) => field.validation);
+  const validFieldValues = validFields.map((field) => {
+    return formdata.metadata.customFields.find(
+      (item) => item.variable_name === field.variableName
+    )?.value;
+  });
+  const filteredValues = validFieldValues.filter(
+    (value) => value !== undefined
+  )[0];
+
+  const handleVlaidate = () => {
+    validateProduct({
+      product_id: formdata.product_id,
+      customer_id: filteredValues,
+    })
+      .unwrap()
+      .then((res) => {
+        if (res.data.valid) {
+          message.success("product is valid");
+        } else {
+          message.error("product is not valid");
+        }
+      })
+      .catch((err) => {
+        message.error(err?.data?.responseDescription || "an error occured");
+      });
+  };
+
   return (
     <div className="mx-auto flex flex-col py-2 px-6 h-screen overflow-y-scroll">
       <header className="flex flex-col md:flex-row justify-between items-center my-6">
@@ -205,54 +235,66 @@ const Cable = () => {
                   {e?.displayName}
                 </label>
                 {e?.selectOptions.length > 1 ? (
-                  <Select
-                    className="!w-full !h-[2.5rem]"
-                    options={e?.selectOptions.map((e: any) => ({
-                      value: e,
-                      label: e,
-                    }))}
-                    onChange={(value) => {
-                      setFormdata((prev) => ({
-                        ...prev,
-                        metadata: {
-                          customFields: prev.metadata.customFields.map(
-                            (item, i) => {
-                              if (item.variable_name === e?.variableName)
-                                return { ...item, value: value };
-                              else return item;
-                            }
-                          ),
-                        },
-                      }));
-                    }}
-                    placeholder={`select ${e?.variableName}`}
-                  />
+                  <div className="flex items-center">
+                    <Select
+                      className="!w-full !h-[2.5rem]"
+                      options={e?.selectOptions.map((e: any) => ({
+                        value: e,
+                        label: e,
+                      }))}
+                      onChange={(value) => {
+                        setFormdata((prev) => ({
+                          ...prev,
+                          metadata: {
+                            customFields: prev.metadata.customFields.map(
+                              (item, i) => {
+                                if (item.variable_name === e?.variableName)
+                                  return { ...item, value: value };
+                                else return item;
+                              }
+                            ),
+                          },
+                        }));
+                      }}
+                      onBlur={e?.required ? handleVlaidate : undefined}
+                      placeholder={`select ${e?.variableName}`}
+                    />
+                    {isvalidating && (
+                      <LoadingOutlined style={{ fontSize: 16 }} spin />
+                    )}
+                  </div>
                 ) : (
-                  <Input
-                    name={e?.variableName}
-                    id={e?.variableName}
-                    placeholder={`Enter ${e?.variableName}`}
-                    required={e?.required}
-                    value={
-                      formdata?.metadata?.customFields.find(
-                        (item) => item.variable_name === e?.variableName
-                      )?.value
-                    }
-                    onChange={(j) => {
-                      setFormdata((prev) => ({
-                        ...prev,
-                        metadata: {
-                          customFields: prev.metadata.customFields.map(
-                            (item, i) => {
-                              if (item.variable_name === e?.variableName)
-                                return { ...item, value: j.target.value };
-                              else return item;
-                            }
-                          ),
-                        },
-                      }));
-                    }}
-                  />
+                  <div className="flex items-center">
+                    <Input
+                      name={e?.variableName}
+                      id={e?.variableName}
+                      placeholder={`Enter ${e?.variableName}`}
+                      required={e?.required}
+                      value={
+                        formdata?.metadata?.customFields.find(
+                          (item) => item.variable_name === e?.variableName
+                        )?.value
+                      }
+                      onChange={(j) => {
+                        setFormdata((prev) => ({
+                          ...prev,
+                          metadata: {
+                            customFields: prev.metadata.customFields.map(
+                              (item, i) => {
+                                if (item.variable_name === e?.variableName)
+                                  return { ...item, value: j.target.value };
+                                else return item;
+                              }
+                            ),
+                          },
+                        }));
+                      }}
+                      onBlur={e?.required ? handleVlaidate : undefined}
+                    />
+                    {isvalidating && (
+                      <LoadingOutlined style={{ fontSize: 16 }} spin />
+                    )}
+                  </div>
                 )}
               </div>
             ))}
