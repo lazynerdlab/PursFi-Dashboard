@@ -44,30 +44,30 @@ export const sidebarData: MenuProps["items"] = [
     ],
   },
 
-  {
-    label: "Payroll",
-    icon: <FaRegUser className=" font-bold" />,
-    key: "payroll-group",
-    children: [
-      {
-        label: (
-          <Link prefetch={false} href="/payroll">
-            Overview
-          </Link>
-        ),
-        key: "payroll",
-      },
-      {
-        label: <Link href="/payroll-setup?step=1">Setup</Link>,
-        key: "payroll-setup",
-      },
-      {
-        label: <Link href="/payroll-settings">Setting</Link>,
-        key: "payroll-settings",
-      },
-    ],
-    // disabled: true,
-  },
+  // {
+  //   label: "Payroll",
+  //   icon: <FaRegUser className=" font-bold" />,
+  //   key: "payroll-group",
+  //   children: [
+  //     {
+  //       label: (
+  //         <Link prefetch={false} href="/payroll">
+  //           Overview
+  //         </Link>
+  //       ),
+  //       key: "payroll",
+  //     },
+  //     {
+  //       label: <Link href="/payroll-setup?step=1">Setup</Link>,
+  //       key: "payroll-setup",
+  //     },
+  //     {
+  //       label: <Link href="/payroll-settings">Setting</Link>,
+  //       key: "payroll-settings",
+  //     },
+  //   ],
+  //   // disabled: true,
+  // },
   {
     label: <Link href="/transactions">Transaction</Link>,
     icon: <GrTransaction className=" font-bold" />,
