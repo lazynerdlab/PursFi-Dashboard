@@ -99,7 +99,7 @@ const Dashbord = () => {
               </p>
             </div>
           </article>
-          <div className="my-4 bg-white py-[1%] px-[2%]">
+          <div className="my-4 bg-white py-[1%] px-[3%]">
             <DashboardChart data={stats || []} />
           </div>
           <DashboardTable />

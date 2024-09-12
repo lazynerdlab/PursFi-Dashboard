@@ -21,7 +21,6 @@ interface Props {
 }
 
 const PinModal: React.FC<Props> = ({ modal, setModal, setPinValid }) => {
-  //const [modal, setModal] = useState(false);
   const [pin, setPin] = useState<string[]>(["", "", "", ""]);
   const inputRefsConfirm = useRef<(HTMLInputElement | null)[]>([]);
   const [countdown, setCountdown] = useState<number | null>(null);
@@ -56,6 +55,7 @@ const PinModal: React.FC<Props> = ({ modal, setModal, setPinValid }) => {
       setPin(newPin);
     }
   };
+
   const handleKeyDownConfirm = (
     e: KeyboardEvent<HTMLInputElement>,
     index: number
@@ -82,16 +82,13 @@ const PinModal: React.FC<Props> = ({ modal, setModal, setPinValid }) => {
       });
   };
 
-  const settingPage = () => {
-    router.push("/setting");
-  };
+ 
 
   return (
     <section>
       <Modal
         open={modal}
         title=""
-        //width={700}
         footer={false}
         onCancel={() => setModal(false)}
         maskClosable={false}
@@ -107,7 +104,7 @@ const PinModal: React.FC<Props> = ({ modal, setModal, setPinValid }) => {
         <p className=" text-center text-sm text-gray-400">
           {hasPin === true
             ? " Enter your 4-digit PIN to authorize this payment"
-            : "You dont have a pin. Go to the setting page to create a new pin ."}
+            : "You don't have a pin. Go to the setting page to create a new pin."}
         </p>
         {hasPin === true ? (
           <div className=" mt-10">
@@ -115,9 +112,9 @@ const PinModal: React.FC<Props> = ({ modal, setModal, setPinValid }) => {
               {pin.map((digit, index) => (
                 <input
                   key={index}
-                  type="text" // Change to text to prevent number input scroll behavior
-                  inputMode="numeric" // Ensures numeric keyboard on mobile devices
-                  placeholder="0"
+                  type="password" 
+                  inputMode="numeric" 
+                  placeholder="•"
                   maxLength={1}
                   value={digit}
                   onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -154,7 +151,7 @@ const PinModal: React.FC<Props> = ({ modal, setModal, setPinValid }) => {
           <div>
             <div className=" mt-5">
               <Button
-                onClick={settingPage}
+                onClick={()=>router.push("/setting")}
                 className=" w-full bg-black text-white !h-10"
               >
                 Settings Page
