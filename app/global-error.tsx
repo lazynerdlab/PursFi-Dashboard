@@ -5,11 +5,11 @@ import Error from "next/error";
 import { useEffect } from "react";
 
 interface GlobalErrorProps {
-  error: Error;
+  error: { message: string };
   reset: () => void;
 }
 
-export default function GlobalError({ error }: GlobalErrorProps) {
+export default function GlobalError({ error, reset }: GlobalErrorProps) {
   useEffect(() => {
     Sentry.captureException(error);
   }, [error]);
